@@ -20,18 +20,44 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
-    - name: List files (debug)
-      run: ls -la
 
-    - name: Restore dependencies
-      run: |
-        dotnet restore Calculator/Calculator.csproj
-        dotnet restore Calculator.Tests/Calculator.Tests.csproj
+[200~cat > .github/workflows/ci.yml << 'EOF'
+name: .NET CI Pipeline
 
-    - name: Build
-      run: |
-        dotnet build Calculator/Calculator.csproj --configuration Release --no-restore
-        dotnet build Calculator.Tests/Calculator.Tests.csproj --configuration Release --no-restore
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: Сборка и тестирование
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: List files for debug
+      run: find . -type f -name "*.csproj" -o -name "*.cs" | sort
+
+    - name: Restore Calculator
+      run: dotnet restore Calculator/Calculator.csproj
+
+    - name: Restore Tests
+      run: dotnet restore Calculator.Tests/Calculator.Tests.csproj
+
+    - name: Build Calculator
+      run: dotnet build Calculator/Calculator.csproj --configuration Release --no-restore
+
+    - name: Build Tests
+      run: dotnet build Calculator.Tests/Calculator.Tests.csproj --configuration Release --no-restore
 
     - name: Run tests
       run: dotnet test Calculator.Tests/Calculator.Tests.csproj --configuration Release --no-build --verbosity normal
