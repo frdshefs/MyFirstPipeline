@@ -20,12 +20,18 @@ jobs:
       with:
         dotnet-version: 8.0.x
 
+    - name: List files (debug)
+      run: ls -la
 
- - name: Restore dependencies
-      run: dotnet restore
+    - name: Restore dependencies
+      run: |
+        dotnet restore Calculator/Calculator.csproj
+        dotnet restore Calculator.Tests/Calculator.Tests.csproj
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: |
+        dotnet build Calculator/Calculator.csproj --configuration Release --no-restore
+        dotnet build Calculator.Tests/Calculator.Tests.csproj --configuration Release --no-restore
 
     - name: Run tests
-      run: dotnet test --configuration Release --no-build --verbosity normal
+      run: dotnet test Calculator.Tests/Calculator.Tests.csproj --configuration Release --no-build --verbosity normal
